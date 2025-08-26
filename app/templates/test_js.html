@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Test</title>
+</head>
+<body>
+    <h1>JavaScript Test Page</h1>
+    <form id="testForm">
+        <input type="text" name="testField" value="test" required>
+        <button type="submit">Test Submit</button>
+    </form>
+    
+    <div id="result"></div>
+    
+    <script>
+        console.log('JavaScript loaded!');
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded!');
+            
+            const form = document.getElementById('testForm');
+            if (form) {
+                console.log('Form found!');
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    console.log('Form submitted!');
+                    document.getElementById('result').innerHTML = '<p>Form submission works!</p>';
+                });
+            } else {
+                console.log('Form NOT found!');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,392 @@
+{% extends "base.html" %}
+
+{% block title %}Predict Sales - Sales Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="main-header">
+        <h1><i class="fas fa-crystal-ball me-3"></i>Sales Prediction</h1>
+        <p>Enter product and store details to predict sales performance</p>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="form-container">
+                <form id="predictionForm">
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h4 class="mb-3">
+                                <i class="fas fa-box me-2 text-primary"></i>Product & Store Information
+                            </h4>
+                        </div>
+                    </div>
+                    
+                    <!-- Product Details -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-tag me-2"></i>Product Details
+                            </h5>
+                            
+                            <div class="mb-3">
+                                <label for="ProductCategory" class="form-label">Product Category</label>
+                                <select class="form-select" id="ProductCategory" name="ProductCategory" required>
+                                    <option value="Household">Household</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="ProductSubCategory" class="form-label">Product SubCategory</label>
+                                <select class="form-select" id="ProductSubCategory" name="ProductSubCategory" required>
+                                    <option value="Electronics">Electronics</option>
+                                    <option value="Clothing">Clothing</option>
+                                    <option value="Food">Food</option>
+                                    <option value="Books">Books</option>
+                                    <option value="Home">Home</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="Price" class="form-label">Price ($)</label>
+                                <input type="number" class="form-control" id="Price" name="Price" step="0.01" min="0" value="100.00" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="Margin" class="form-label">Margin</label>
+                                <div class="d-flex align-items-center">
+                                    <input type="range" class="form-range me-3" id="Margin" name="Margin" min="0" max="1" step="0.01" value="0.25">
+                                    <span id="marginValue" class="badge bg-primary">25%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="Pack_type" class="form-label">Pack Type</label>
+                                <select class="form-select" id="Pack_type" name="Pack_type" required>
+                                    <option value="Fresh">Fresh</option>
+                                    <option value="Frozen">Frozen</option>
+                                    <option value="Packaged">Packaged</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="Size" class="form-label">Size</label>
+                                <select class="form-select" id="Size" name="Size" required>
+                                    <option value="Large">Large</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Small">Small</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="Sales_velocity" class="form-label">Sales Velocity</label>
+                                <input type="number" class="form-control" id="Sales_velocity" name="Sales_velocity" step="0.1" min="0" value="2.0" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="Price_per_volume" class="form-label">Price per Volume</label>
+                                <input type="number" class="form-control" id="Price_per_volume" name="Price_per_volume" step="0.01" min="0" value="10.0" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="Shelf_life" class="form-label">Shelf Life (days)</label>
+                                <input type="number" class="form-control" id="Shelf_life" name="Shelf_life" min="1" value="365" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Store Details -->
+                        <div class="col-md-6">
+                            <h5 class="text-success mb-3">
+                                <i class="fas fa-store me-2"></i>Store Details
+                            </h5>
+                            
+                            <div class="mb-3">
+                                <label for="StoreID" class="form-label">Store ID</label>
+                                <input type="number" class="form-control" id="StoreID" name="StoreID" min="1" value="1001" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="Format" class="form-label">Store Format</label>
+                                <select class="form-select" id="Format" name="Format" required>
+                                    <option value="Convenience">Convenience</option>
+                                    <option value="Supermarket">Supermarket</option>
+                                    <option value="Hypermarket">Hypermarket</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="Location_cluster" class="form-label">Location</label>
+                                <select class="form-select" id="Location_cluster" name="Location_cluster" required>
+                                    <option value="Anandapura">Anandapura</option>
+                                    <option value="Bangalore">Bangalore</option>
+                                    <option value="Chennai">Chennai</option>
+                                    <option value="Mumbai">Mumbai</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="Basket_value" class="form-label">Average Basket Value ($)</label>
+                                <input type="number" class="form-control" id="Basket_value" name="Basket_value" step="0.01" min="0" value="150" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="Category_contribution" class="form-label">Category Contribution</label>
+                                <div class="d-flex align-items-center">
+                                    <input type="range" class="form-range me-3" id="Category_contribution" name="Category_contribution" min="0" max="1" step="0.01" value="0.15">
+                                    <span id="categoryValue" class="badge bg-success">15%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="SKU_count_in_subcategory" class="form-label">SKU Count in SubCategory</label>
+                                <input type="number" class="form-control" id="SKU_count_in_subcategory" name="SKU_count_in_subcategory" min="1" value="25" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="Brand_share" class="form-label">Brand Share</label>
+                                <div class="d-flex align-items-center">
+                                    <input type="range" class="form-range me-3" id="Brand_share" name="Brand_share" min="0" max="1" step="0.01" value="0.12">
+                                    <span id="brandValue" class="badge bg-warning">12%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="Month" class="form-label">Month</label>
+                                <select class="form-select" id="Month" name="Month" required>
+                                    <option value="June">June</option>
+                                    <option value="January">January</option>
+                                    <option value="February">February</option>
+                                    <option value="March">March</option>
+                                    <option value="April">April</option>
+                                    <option value="May">May</option>
+                                    <option value="July">July</option>
+                                    <option value="August">August</option>
+                                    <option value="September">September</option>
+                                    <option value="October">October</option>
+                                    <option value="November">November</option>
+                                    <option value="December">December</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <div class="row mt-4">
+                        <div class="col-12 text-center">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-crystal-ball me-2"></i>Predict Sales Success
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Loading Indicator -->
+    <div class="loading" id="loadingIndicator">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">Making prediction...</p>
+    </div>
+    
+    <!-- Prediction Results -->
+    <div id="predictionResults" style="display: none;"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Update range slider values
+    document.getElementById('Margin').addEventListener('input', function() {
+        document.getElementById('marginValue').textContent = Math.round(this.value * 100) + '%';
+    });
+    
+    document.getElementById('Category_contribution').addEventListener('input', function() {
+        document.getElementById('categoryValue').textContent = Math.round(this.value * 100) + '%';
+    });
+    
+    document.getElementById('Brand_share').addEventListener('input', function() {
+        document.getElementById('brandValue').textContent = Math.round(this.value * 100) + '%';
+    });
+    
+    // Handle form submission
+    document.getElementById('predictionForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        console.log('Form submitted!');
+        
+        // Show loading indicator
+        document.getElementById('loadingIndicator').style.display = 'block';
+        document.getElementById('predictionResults').style.display = 'none';
+        
+        // Collect form data
+        const formData = new FormData(this);
+        const data = {};
+        
+        for (let [key, value] of formData.entries()) {
+            // Convert numeric fields
+            if (['Price', 'Margin', 'Sales_velocity', 'Price_per_volume', 'Shelf_life', 
+                 'StoreID', 'Basket_value', 'Category_contribution', 'SKU_count_in_subcategory', 
+                 'Brand_share'].includes(key)) {
+                data[key] = parseFloat(value);
+            } else {
+                data[key] = value;
+            }
+        }
+        
+        console.log('Form data collected:', data);
+        
+        // Make API call
+        fetch('/api/predict', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            console.log('Response received:', response.status);
+            return response.json();
+        })
+        .then(result => {
+            console.log('Result:', result);
+            // Hide loading indicator
+            document.getElementById('loadingIndicator').style.display = 'none';
+            
+            if (result.success) {
+                displayPredictionResult(result);
+            } else {
+                displayError(result.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Hide loading indicator
+            document.getElementById('loadingIndicator').style.display = 'none';
+            displayError('An error occurred while making the prediction: ' + error.message);
+        });
+    });
+    
+    function displayPredictionResult(result) {
+        const resultHtml = `
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="prediction-result">
+                        <h3><i class="fas fa-target me-2"></i>Prediction Result</h3>
+                        <div class="prediction-class">${result.predicted_class}</div>
+                        <p><strong>Confidence:</strong> ${result.confidence}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="chart-container">
+                        <h4 class="mb-3">
+                            <i class="fas fa-chart-bar me-2"></i>Prediction Confidence by Category
+                        </h4>
+                        <div id="confidenceChart"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h4 class="mb-3">
+                        <i class="fas fa-lightbulb me-2"></i>Business Recommendations
+                    </h4>
+                    ${getBusinessRecommendations(result.predicted_class)}
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('predictionResults').innerHTML = resultHtml;
+        document.getElementById('predictionResults').style.display = 'block';
+        
+        // Render confidence chart
+        const confidenceData = JSON.parse(result.confidence_chart);
+        Plotly.newPlot('confidenceChart', confidenceData.data, confidenceData.layout, {responsive: true});
+        
+        // Scroll to results
+        document.getElementById('predictionResults').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    function getBusinessRecommendations(predictedClass) {
+        const recommendations = {
+            'Top Seller': {
+                class: 'success',
+                icon: 'fas fa-star',
+                title: 'Excellent Choice!',
+                text: 'This product-store combination is predicted to be a Top Seller.',
+                actions: [
+                    'Increase inventory levels',
+                    'Consider premium placement',
+                    'Plan promotional campaigns'
+                ]
+            },
+            'Good Seller': {
+                class: 'info',
+                icon: 'fas fa-thumbs-up',
+                title: 'Good Potential!',
+                text: 'This product-store combination shows good sales potential.',
+                actions: [
+                    'Maintain adequate stock levels',
+                    'Monitor performance closely',
+                    'Consider targeted marketing'
+                ]
+            },
+            'Moderate Seller': {
+                class: 'warning',
+                icon: 'fas fa-balance-scale',
+                title: 'Moderate Performance Expected',
+                text: 'This combination may have average sales.',
+                actions: [
+                    'Stock conservatively',
+                    'Consider price optimization',
+                    'Monitor competitor activity'
+                ]
+            },
+            'Slow Seller': {
+                class: 'danger',
+                icon: 'fas fa-exclamation-triangle',
+                title: 'Caution Advised!',
+                text: 'This product-store combination is predicted to be a Slow Seller.',
+                actions: [
+                    'Minimize initial inventory',
+                    'Consider alternative products',
+                    'Review pricing strategy'
+                ]
+            }
+        };
+        
+        const rec = recommendations[predictedClass];
+        const actionsList = rec.actions.map(action => `<li><i class="fas fa-arrow-right me-2"></i>${action}</li>`).join('');
+        
+        return `
+            <div class="alert alert-${rec.class}">
+                <h5><i class="${rec.icon} me-2"></i>${rec.title}</h5>
+                <p>${rec.text}</p>
+                <ul class="mb-0">
+                    ${actionsList}
+                </ul>
+            </div>
+        `;
+    }
+    
+    function displayError(error) {
+        const errorHtml = `
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="alert alert-danger">
+                        <h5><i class="fas fa-exclamation-circle me-2"></i>Prediction Error</h5>
+                        <p class="mb-0">${error}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('predictionResults').innerHTML = errorHtml;
+        document.getElementById('predictionResults').style.display = 'block';
+    }
+</script>
+{% endblock %}

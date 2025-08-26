@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Test Prediction - Sales Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Test Prediction Page</h1>
+    <form id="testForm">
+        <input type="text" name="test" value="test">
+        <button type="submit">Test Submit</button>
+    </form>
+    <div id="result"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    console.log('Test script loaded');
+    
+    document.getElementById('testForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        console.log('Test form submitted');
+        document.getElementById('result').innerHTML = 'Form submitted successfully!';
+    });
+</script>
+{% endblock %}
