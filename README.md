@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Sales Prediction Dashboard
 
 A Flask-based web application for predicting sales success using CatBoost machine learning. This dashboard provides intelligent product-store combination analytics with interactive visualizations and real-time predictions.
@@ -240,3 +241,7 @@ For support and questions:
 ---
 
 **Built with ❤️ using Flask, CatBoost, and modern web technologies**
+=======
+# MSC_AI_DS_sales_predicition_board
+This is the official repository for the sales prediction project.
+>>>>>>> origin/main
