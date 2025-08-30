@@ -38,47 +38,10 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="metric-card">
-                <div class="metric-value">{{ top_importance }}</div>
-                <div class="metric-label">
-                    <i class="fas fa-percentage me-1"></i>Feature Importance
-                </div>
-            </div>
-        </div>
+        <!-- Feature Importance metric card removed -->
     </div>
     
-    <!-- Charts Row -->
-    <div class="row mb-4">
-        <div class="col-lg-6 mb-4">
-            <div class="chart-container">
-                <h4 class="mb-3">
-                    <i class="fas fa-pie-chart me-2"></i>Sales Category Distribution
-                </h4>
-                <div id="distributionChart"></div>
-            </div>
-        </div>
-        <div class="col-lg-6 mb-4">
-            <div class="chart-container">
-                <h4 class="mb-3">
-                    <i class="fas fa-chart-bar me-2"></i>Model Performance by Category
-                </h4>
-                <div id="performanceChart"></div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Feature Importance Chart -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="chart-container">
-                <h4 class="mb-3">
-                    <i class="fas fa-ranking-star me-2"></i>Feature Importance Analysis
-                </h4>
-                <div id="featureChart"></div>
-            </div>
-        </div>
-    </div>
+    <!-- Charts Section Removed -->
     
     <!-- Key Insights -->
     <div class="row mb-4">
@@ -103,7 +66,7 @@
             <div class="metric-card">
                 <h5><i class="fas fa-chart-line me-2 text-primary"></i>Key Drivers</h5>
                 <ul class="list-unstyled mt-3">
-                    <li><i class="fas fa-arrow-right text-primary me-2"></i><strong>{{ top_feature }}</strong> is most important ({{ top_importance }})</li>
+                    <li><i class="fas fa-arrow-right text-primary me-2"></i><strong>{{ top_feature }}</strong> is the most important feature</li>
                     <li><i class="fas fa-arrow-right text-primary me-2"></i>Price-related features dominate predictions</li>
                     <li><i class="fas fa-arrow-right text-primary me-2"></i>Store location and product category contribute significantly</li>
                 </ul>
@@ -146,7 +109,7 @@
                 <i class="fas fa-chart-bar fa-3x text-success mb-3"></i>
                 <h5>View Performance</h5>
                 <p class="text-muted">Analyze detailed model performance metrics</p>
-                <a href="{{ url_for('performance_page') }}" class="btn btn-success">
+                <!-- Performance page link removed -->
                     <i class="fas fa-arrow-right me-1"></i>View Details
                 </a>
             </div>
@@ -167,20 +130,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-    // Render charts
-    document.addEventListener('DOMContentLoaded', function() {
-        // Distribution Chart
-        var distributionData = {{ distribution_chart|safe }};
-        Plotly.newPlot('distributionChart', distributionData.data, distributionData.layout, {responsive: true});
-        
-        // Performance Chart
-        var performanceData = {{ performance_chart|safe }};
-        Plotly.newPlot('performanceChart', performanceData.data, performanceData.layout, {responsive: true});
-        
-        // Feature Importance Chart
-        var featureData = {{ feature_chart|safe }};
-        Plotly.newPlot('featureChart', featureData.data, featureData.layout, {responsive: true});
-    });
-</script>
+<!-- Chart JavaScript removed -->
 {% endblock %}

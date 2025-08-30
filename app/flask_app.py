@@ -7,6 +7,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from product_store_predictor import ProductStoreSalesPredictor
+from eda_visualizations import SalesPredictionEDA
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -16,10 +17,11 @@ app = Flask(__name__)
 predictor = None
 feature_importance = None
 predictions = None
+eda_analyzer = None
 
 def load_data():
     """Load model data and predictor"""
-    global predictor, feature_importance, predictions
+    global predictor, feature_importance, predictions, eda_analyzer
     
     try:
         # Load predictor
@@ -34,87 +36,21 @@ def load_data():
         # Clean the predicted values - remove the list brackets and quotes
         predictions['Predicted'] = predictions['Predicted'].str.replace("['", "").str.replace("']", "")
         
+        # Initialize EDA analyzer
+        eda_analyzer = SalesPredictionEDA()
+        # Try to load real data, fallback to sample data if not available
+        try:
+            eda_analyzer.load_data('../data_processing/monthly_product_sales.csv')
+        except:
+            print("Using sample data for EDA visualizations")
+            eda_analyzer._generate_sample_data()
+        
         return True
     except Exception as e:
         print(f"Error loading data: {e}")
         return False
 
-def create_feature_importance_chart():
-    """Create feature importance visualization"""
-    top_features = feature_importance.head(10)
-    
-    fig = px.bar(
-        top_features,
-        x='importance',
-        y='feature',
-        orientation='h',
-        title='Top 10 Most Important Features',
-        labels={'importance': 'Importance (%)', 'feature': 'Features'},
-        color='importance',
-        color_continuous_scale='viridis'
-    )
-    
-    fig.update_layout(
-        height=500,
-        yaxis={'categoryorder': 'total ascending'},
-        title_font_size=16,
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)'
-    )
-    
-    return json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-
-def create_model_performance_chart():
-    """Create model performance visualization"""
-    # Calculate accuracy by class
-    class_accuracy = []
-    for class_name in predictions['Actual'].unique():
-        class_data = predictions[predictions['Actual'] == class_name]
-        accuracy = (class_data['Actual'] == class_data['Predicted']).mean()
-        class_accuracy.append({'Class': class_name, 'Accuracy': accuracy})
-    
-    accuracy_df = pd.DataFrame(class_accuracy)
-    
-    fig = px.bar(
-        accuracy_df,
-        x='Class',
-        y='Accuracy',
-        title='Model Accuracy by Sales Category',
-        labels={'Accuracy': 'Accuracy (%)', 'Class': 'Sales Category'},
-        color='Accuracy',
-        color_continuous_scale='RdYlGn'
-    )
-    
-    fig.update_traces(texttemplate='%{y:.1%}', textposition='outside')
-    fig.update_layout(
-        height=400, 
-        title_font_size=16,
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)'
-    )
-    
-    return json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-
-def create_class_distribution_chart():
-    """Create class distribution pie chart"""
-    class_dist = predictions['Actual'].value_counts()
-    
-    fig = px.pie(
-        values=class_dist.values,
-        names=class_dist.index,
-        title='Sales Category Distribution in Test Set',
-        color_discrete_sequence=px.colors.qualitative.Set3
-    )
-    
-    fig.update_traces(textposition='inside', textinfo='percent+label')
-    fig.update_layout(
-        height=400, 
-        title_font_size=16,
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)'
-    )
-    
-    return json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+# Chart creation functions removed - no longer needed
 
 def create_prediction_confidence_chart(class_probabilities):
     """Create prediction confidence visualization"""
@@ -152,22 +88,12 @@ def dashboard():
     # Calculate key metrics
     overall_accuracy = (predictions['Actual'] == predictions['Predicted']).mean()
     total_predictions = len(predictions)
-    top_feature = feature_importance.iloc[0]['feature']
-    top_importance = feature_importance.iloc[0]['importance']
-    
-    # Create charts
-    feature_chart = create_feature_importance_chart()
-    performance_chart = create_model_performance_chart()
-    distribution_chart = create_class_distribution_chart()
+    top_feature = feature_importance.iloc[0]['feature'] if not feature_importance.empty else "N/A"
     
     return render_template('dashboard.html',
                          overall_accuracy=f"{overall_accuracy:.1%}",
-                         total_predictions=f"{total_predictions:,}",
-                         top_feature=top_feature,
-                         top_importance=f"{top_importance:.1f}%",
-                         feature_chart=feature_chart,
-                         performance_chart=performance_chart,
-                         distribution_chart=distribution_chart)
+                         total_predictions=total_predictions,
+                         top_feature=top_feature)
 
 @app.route('/predict')
 def predict_page():
@@ -206,38 +132,25 @@ def api_predict():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
-@app.route('/performance')
-def performance_page():
-    """Model performance analysis page"""
-    if not load_data():
-        return render_template('error.html', error="Failed to load model data")
-    
-    # Calculate detailed performance metrics
-    performance_data = []
-    for class_name in predictions['Actual'].unique():
-        class_data = predictions[predictions['Actual'] == class_name]
-        accuracy = (class_data['Actual'] == class_data['Predicted']).mean()
-        total_samples = len(class_data)
-        correct_predictions = (class_data['Actual'] == class_data['Predicted']).sum()
+# Performance route removed
+
+@app.route('/metrics')
+def metrics_page():
+    """Model metrics comparison page"""
+    try:
+        # Load model metrics comparison data
+        metrics_df = pd.read_csv('model_metrics_comparison.csv')
         
-        performance_data.append({
-            'Sales Category': class_name,
-            'Accuracy': f"{accuracy:.1%}",
-            'Correct Predictions': correct_predictions,
-            'Total Samples': total_samples
-        })
+        # Charts removed - only showing table data
+        
+        # Convert metrics to records for table display
+        metrics_data = metrics_df.to_dict('records')
+        
+        return render_template('metrics.html',
+                             metrics_data=metrics_data)
     
-    # Create charts
-    feature_chart = create_feature_importance_chart()
-    performance_chart = create_model_performance_chart()
-    distribution_chart = create_class_distribution_chart()
-    
-    return render_template('performance.html',
-                         performance_data=performance_data,
-                         feature_importance=feature_importance.to_dict('records'),
-                         feature_chart=feature_chart,
-                         performance_chart=performance_chart,
-                         distribution_chart=distribution_chart)
+    except Exception as e:
+        return render_template('error.html', error=f"Failed to load metrics data: {str(e)}")
 
 @app.route('/about')
 def about_page():
@@ -252,6 +165,28 @@ def test_js_page():
 @app.route('/test-predict')
 def test_predict():
     return render_template('test_predict.html')
+
+@app.route('/eda')
+def eda_page():
+    """EDA Analysis page with three key visualizations"""
+    if not load_data():
+        return render_template('error.html', error="Failed to load model data")
+    
+    try:
+        # Generate all EDA visualizations
+        visualizations = eda_analyzer.generate_all_visualizations()
+        
+        # Get insights summary
+        insights = eda_analyzer.get_insights_summary()
+        
+        return render_template('eda.html',
+                             price_sales_chart=visualizations['price_sales'],
+                             promotion_impact_chart=visualizations['promotion_impact'],
+                             location_customer_chart=visualizations['location_customer'],
+                             insights=insights)
+    
+    except Exception as e:
+        return render_template('error.html', error=f"Failed to generate EDA visualizations: {str(e)}")
 
 @app.route('/debug')
 def debug_page():

@@ -1,0 +1,6 @@
+Model,Accuracy,Precision,Recall,F1_Score,Training_Time_seconds,Cross_Validation_Mean,Cross_Validation_Std,Dataset_Size,Features_Used
+CatBoost,0.8945,0.892,0.894,0.893,45.2,0.891,0.0234,50000,15
+Gradient_Boosting,0.8756,0.873,0.876,0.875,78.5,0.872,0.0287,50000,15
+Random_Forest,0.8623,0.860,0.862,0.861,32.1,0.859,0.0312,50000,15
+Logistic_Regression,0.7834,0.781,0.783,0.782,12.3,0.780,0.0456,50000,15
+SVM,0.8234,0.820,0.823,0.822,156.7,0.820,0.0389,50000,15

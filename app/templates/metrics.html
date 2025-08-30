@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Model Metrics Comparison - Sales Prediction Dashboard{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="main-header">
+    <div class="container">
+        <h1><i class="fas fa-table me-3"></i>Model Metrics Comparison</h1>
+        <p>Comprehensive evaluation and comparison of machine learning models</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="metric-card">
+                <div class="metric-value">{{ metrics_data|length }}</div>
+                <div class="metric-label">Models Compared</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-card">
+                <div class="metric-value">{{ "%.1f%%"|format((metrics_data|map(attribute='Accuracy')|max) * 100) }}</div>
+                <div class="metric-label">Best Accuracy</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-card">
+                <div class="metric-value">{{ "%.1f"|format(metrics_data|map(attribute='Training_Time_seconds')|min) }}s</div>
+                <div class="metric-label">Fastest Training</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-card">
+                <div class="metric-value">{{ metrics_data[0]['Dataset_Size']|int|string|replace('000', 'K') }}</div>
+                <div class="metric-label">Dataset Size</div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Detailed Metrics Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="chart-container">
+                <h3 class="mb-4"><i class="fas fa-table me-2"></i>Detailed Model Metrics</h3>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-robot me-1"></i>Model</th>
+                                <th><i class="fas fa-bullseye me-1"></i>Accuracy</th>
+                                <th><i class="fas fa-crosshairs me-1"></i>Precision</th>
+                                <th><i class="fas fa-search me-1"></i>Recall</th>
+                                <th><i class="fas fa-balance-scale me-1"></i>F1-Score</th>
+                                <th><i class="fas fa-clock me-1"></i>Training Time</th>
+                                <th><i class="fas fa-chart-line me-1"></i>CV Mean</th>
+                                <th><i class="fas fa-chart-area me-1"></i>CV Std</th>
+                                <th><i class="fas fa-database me-1"></i>Features</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for metric in metrics_data %}
+                            <tr>
+                                <td>
+                                    <strong>{{ metric.Model.replace('_', ' ') }}</strong>
+                                    {% if metric.Model == 'CatBoost' %}
+                                        <span class="badge bg-success ms-2">Best</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">{{ "%.2f%%"|format(metric.Accuracy * 100) }}</span>
+                                </td>
+                                <td>{{ "%.3f"|format(metric.Precision) }}</td>
+                                <td>{{ "%.3f"|format(metric.Recall) }}</td>
+                                <td>{{ "%.3f"|format(metric.F1_Score) }}</td>
+                                <td>
+                                    <span class="text-muted">{{ "%.1f"|format(metric.Training_Time_seconds) }}s</span>
+                                </td>
+                                <td>{{ "%.3f"|format(metric.Cross_Validation_Mean) }}</td>
+                                <td>{{ "%.4f"|format(metric.Cross_Validation_Std) }}</td>
+                                <td>{{ metric.Features_Used }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Insights -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h4><i class="fas fa-lightbulb me-2"></i>Key Insights</h4>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="fas fa-trophy text-warning me-2"></i>
+                        <strong>CatBoost</strong> achieves the highest accuracy at {{ "%.2f%%"|format((metrics_data|selectattr('Model', 'equalto', 'CatBoost')|first).Accuracy * 100) }}
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-tachometer-alt text-success me-2"></i>
+                        <strong>Logistic Regression</strong> is the fastest to train at {{ "%.1f"|format((metrics_data|selectattr('Model', 'equalto', 'Logistic_Regression')|first).Training_Time_seconds) }} seconds
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-balance-scale text-info me-2"></i>
+                        All models show consistent performance across precision and recall metrics
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-chart-line text-primary me-2"></i>
+                        Cross-validation scores indicate stable model performance
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h4><i class="fas fa-recommendations me-2"></i>Recommendations</h4>
+                <div class="alert alert-info">
+                    <h6><i class="fas fa-star me-1"></i>Production Model</h6>
+                    <p class="mb-2">Use <strong>CatBoost</strong> for production deployment due to its superior accuracy and robust performance.</p>
+                </div>
+                <div class="alert alert-warning">
+                    <h6><i class="fas fa-clock me-1"></i>Quick Prototyping</h6>
+                    <p class="mb-2">Consider <strong>Logistic Regression</strong> for rapid prototyping and baseline comparisons.</p>
+                </div>
+                <div class="alert alert-success">
+                    <h6><i class="fas fa-cogs me-1"></i>Ensemble Approach</h6>
+                    <p class="mb-0">Combine top-performing models for potentially better results.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}
